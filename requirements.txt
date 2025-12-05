@@ -1,3 +1,13 @@
 pandas
 numpy
 scikit-learn
+
+black
+
+ruff
+
+isort
+
+mypy
+
+pre-commit
