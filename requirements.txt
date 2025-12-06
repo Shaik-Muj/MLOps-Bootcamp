@@ -11,3 +11,7 @@ isort
 mypy
 
 pre-commit
+
+pyyaml
+
+types-PyYAML
