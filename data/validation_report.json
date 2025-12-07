@@ -1,0 +1,72 @@
+{
+  "success": true,
+  "checks": [
+    {
+      "check": "column_names_match",
+      "success": true,
+      "details": {
+        "expected": [
+          "feature1",
+          "feature2",
+          "target"
+        ],
+        "found": [
+          "feature1",
+          "feature2",
+          "target"
+        ]
+      }
+    },
+    {
+      "check": "target_no_nulls",
+      "success": true,
+      "details": {
+        "null_count": 0
+      }
+    },
+    {
+      "check": "target_allowed_values",
+      "success": true,
+      "details": {
+        "found_values": [
+          0,
+          1
+        ],
+        "allowed": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "check": "feature1_is_numeric",
+      "success": true,
+      "details": {
+        "dtype": "int64"
+      }
+    },
+    {
+      "check": "feature2_is_numeric",
+      "success": true,
+      "details": {
+        "dtype": "int64"
+      }
+    },
+    {
+      "check": "row_count_minimum",
+      "success": true,
+      "details": {
+        "row_count": 5,
+        "min_required": 3
+      }
+    },
+    {
+      "check": "feature1_iqr_positive",
+      "success": true,
+      "details": {
+        "p25": 2.0,
+        "p75": 4.0
+      }
+    }
+  ]
+}

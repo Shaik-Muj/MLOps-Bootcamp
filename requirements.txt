@@ -17,3 +17,7 @@ pyyaml
 types-PyYAML
 
 mlflow
+
+great_expectations
+
+dvc
