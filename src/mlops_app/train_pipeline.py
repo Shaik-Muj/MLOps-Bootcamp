@@ -2,6 +2,8 @@ import logging
 from pathlib import Path
 
 import joblib
+import mlflow
+import mlflow.sklearn
 import numpy as np
 import pandas as pd
 import yaml
@@ -28,37 +30,54 @@ def train_model():
     config = load_config()
     set_seed(config["train"]["random_state"])
 
-    logging.info("Loading data...")
-    df = pd.read_csv("data/raw/sample.csv")  # you’ll replace this soon
+    mlflow.set_experiment("training_experiment")
 
-    target_col = config["train"]["target_column"]
-    X = df.drop(columns=[target_col])
-    y = df[target_col]
+    with mlflow.start_run():
+        logging.info("Loading data...")
+        df = pd.read_csv("data/raw/sample.csv")
 
-    logging.info("Splitting data...")
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=config["train"]["test_size"],
-        random_state=config["train"]["random_state"],
-    )
+        target_col = config["train"]["target_column"]
+        X = df.drop(columns=[target_col])
+        y = df[target_col]
 
-    logging.info("Training model...")
-    model = RandomForestClassifier(
-        n_estimators=config["model"]["n_estimators"],
-        max_depth=config["model"]["max_depth"],
-    )
-    model.fit(X_train, y_train)
+        logging.info("Splitting data...")
+        X_train, X_test, y_train, y_test = train_test_split(
+            X,
+            y,
+            test_size=config["train"]["test_size"],
+            random_state=config["train"]["random_state"],
+        )
 
-    preds = model.predict(X_test)
-    acc = accuracy_score(y_test, preds)
+        logging.info("Training model...")
+        model = RandomForestClassifier(
+            n_estimators=config["model"]["n_estimators"],
+            max_depth=config["model"]["max_depth"],
+        )
+        model.fit(X_train, y_train)
 
-    logging.info(f"Model accuracy: {acc:.4f}")
+        preds = model.predict(X_test)
+        acc = accuracy_score(y_test, preds)
 
-    # save model
-    Path("models").mkdir(exist_ok=True)
-    joblib.dump(model, "models/model.pkl")
-    logging.info("Model saved to models/model.pkl")
+        logging.info(f"Model accuracy: {acc:.4f}")
+
+        # MLflow logging
+        mlflow.log_params(
+            {
+                "test_size": config["train"]["test_size"],
+                "random_state": config["train"]["random_state"],
+                "n_estimators": config["model"]["n_estimators"],
+                "max_depth": config["model"]["max_depth"],
+            }
+        )
+
+        mlflow.log_metric("accuracy", acc)
+
+        Path("models").mkdir(exist_ok=True)
+        joblib.dump(model, "models/model.pkl")
+        mlflow.log_artifact("models/model.pkl")
+
+        # Log config as artifact
+        mlflow.log_artifact("configs/train_config.yaml")
 
 
 if __name__ == "__main__":
